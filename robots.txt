@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Block stale/unused pages
+Disallow: /portfolio/starter-page.html
+Disallow: /portfolio/service-details.html
+Disallow: /portfolio/portfolio-details.html
+Disallow: /portfolio/accenture-project2-details.html
+Disallow: /portfolio/accenture-project3-details.html
+Disallow: /portfolio/wipro-project1-details.html
+Disallow: /portfolio/wipro-project2-details.html
+Disallow: /portfolio/wipro-project3-details.html
+Disallow: /portfolio/forms/
+
+Sitemap: https://vishnureddy45.github.io/portfolio/sitemap.xml
