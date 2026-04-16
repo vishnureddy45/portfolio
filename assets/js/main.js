@@ -5,44 +5,94 @@
   'use strict';
 
   // Preloader
-  window.addEventListener('load', () => {
-    const pre = document.getElementById('preloader');
-    if (pre) { pre.style.opacity = '0'; setTimeout(() => pre.remove(), 400); }
+  window.addEventListener('load', function() {
+    var pre = document.getElementById('preloader');
+    if (pre) { pre.style.opacity = '0'; setTimeout(function(){ pre.remove(); }, 400); }
   });
 
   // Scroll-top button
-  const scrollTop = document.getElementById('scroll-top');
+  var scrollTop = document.getElementById('scroll-top');
   if (scrollTop) {
-    const toggle = () => window.scrollY > 200 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
-    window.addEventListener('scroll', toggle);
-    scrollTop.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    toggle();
+    var toggleScrollTop = function() {
+      window.scrollY > 200 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
+    };
+    window.addEventListener('scroll', toggleScrollTop);
+    scrollTop.addEventListener('click', function(e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    toggleScrollTop();
   }
 
   // Header scroll effect
-  const header = document.getElementById('header');
+  var header = document.getElementById('header');
   if (header) {
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', function() {
       window.scrollY > 20 ? header.classList.add('scrolled') : header.classList.remove('scrolled');
     });
   }
 
-  // Mobile nav
-  const mobileToggle = document.querySelector('.mobile-nav-toggle');
-  if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-      document.body.classList.toggle('mobile-nav-active');
-      mobileToggle.classList.toggle('bi-list');
-      mobileToggle.classList.toggle('bi-x');
+  // ── MOBILE NAV DRAWER ──
+  // Build a drawer element appended directly to <body>
+  // so it is never trapped inside the header's stacking context
+  var mobileToggle = document.querySelector('.mobile-nav-toggle');
+  var navmenu = document.querySelector('.navmenu');
+
+  if (mobileToggle && navmenu) {
+    // Clone nav links
+    var navLinks = navmenu.querySelectorAll('ul li');
+
+    // Build drawer HTML
+    var drawer = document.createElement('div');
+    drawer.className = 'mobile-nav-drawer';
+    drawer.setAttribute('id', 'mobileNavDrawer');
+
+    var backdrop = document.createElement('div');
+    backdrop.className = 'mobile-nav-backdrop';
+
+    var panel = document.createElement('div');
+    panel.className = 'mobile-nav-panel';
+
+    var ul = document.createElement('ul');
+    navLinks.forEach(function(li) {
+      var clone = li.cloneNode(true);
+      ul.appendChild(clone);
     });
-    document.querySelectorAll('.navmenu a').forEach(a => {
-      a.addEventListener('click', () => {
-        if (document.body.classList.contains('mobile-nav-active')) {
-          document.body.classList.remove('mobile-nav-active');
-          mobileToggle.classList.add('bi-list');
-          mobileToggle.classList.remove('bi-x');
-        }
-      });
+
+    panel.appendChild(ul);
+    drawer.appendChild(backdrop);
+    drawer.appendChild(panel);
+    document.body.appendChild(drawer);
+
+    function openNav() {
+      drawer.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      mobileToggle.classList.remove('bi-list');
+      mobileToggle.classList.add('bi-x');
+    }
+
+    function closeNav() {
+      drawer.classList.remove('open');
+      document.body.style.overflow = '';
+      mobileToggle.classList.add('bi-list');
+      mobileToggle.classList.remove('bi-x');
+    }
+
+    mobileToggle.addEventListener('click', function() {
+      drawer.classList.contains('open') ? closeNav() : openNav();
+    });
+
+    // Close on backdrop click
+    backdrop.addEventListener('click', closeNav);
+
+    // Close on link click
+    ul.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', closeNav);
+    });
+
+    // Close on resize back to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 991) closeNav();
     });
   }
 
@@ -52,30 +102,30 @@
   }
 
   // Typed.js
-  const typedEl = document.querySelector('.typed');
+  var typedEl = document.querySelector('.typed');
   if (typedEl && typeof Typed !== 'undefined') {
-    const items = (typedEl.dataset.typedItems || '').split(',').map(s => s.trim()).filter(Boolean);
+    var items = (typedEl.dataset.typedItems || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
     if (items.length) {
       new Typed('.typed', { strings: items, typeSpeed: 50, backSpeed: 28, backDelay: 2200, loop: true });
     }
   }
 
   // Skill bar animation
-  const fills = document.querySelectorAll('.skill-fill');
+  var fills = document.querySelectorAll('.skill-fill');
   if (fills.length) {
-    const animate = () => {
-      fills.forEach(fill => {
-        const rect = fill.getBoundingClientRect();
+    var animateFills = function() {
+      fills.forEach(function(fill) {
+        var rect = fill.getBoundingClientRect();
         if (rect.top < window.innerHeight - 40 && !fill.dataset.done) {
           fill.dataset.done = '1';
-          const w = fill.style.width;
+          var w = fill.style.width;
           fill.style.width = '0';
-          requestAnimationFrame(() => { fill.style.width = w; });
+          requestAnimationFrame(function(){ fill.style.width = w; });
         }
       });
     };
-    window.addEventListener('scroll', animate, { passive: true });
-    animate();
+    window.addEventListener('scroll', animateFills, { passive: true });
+    animateFills();
   }
 
 })();
